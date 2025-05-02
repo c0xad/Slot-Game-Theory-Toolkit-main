@@ -1,0 +1,8 @@
+Optimization Results Summary
+==========================
+
+Status: Failed
+Best objective value: None
+Message: name 'np' is not defined
+
+Best parameters:

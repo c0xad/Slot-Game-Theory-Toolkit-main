@@ -1,0 +1,203 @@
+{
+  "success": false,
+  "best_value": null,
+  "message": "name 'np' is not defined",
+  "best_parameters": null,
+  "timestamp": "20250502-193016",
+  "configuration": {
+    "optimization_name": "default_optimization",
+    "description": "Default optimization configuration for the Slot Game Theory Toolkit",
+    "base_game_config": {
+      "name": "Optimizable Slot Game",
+      "type": "standard",
+      "rtp_target": 0.92,
+      "reels": {
+        "num_reels": 5,
+        "num_rows": 3,
+        "paylines": 25,
+        "symbols": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "WILD",
+          "SCATTER"
+        ]
+      },
+      "paytable_base": {
+        "A": [
+          0,
+          0,
+          5,
+          25,
+          100
+        ],
+        "B": [
+          0,
+          0,
+          5,
+          25,
+          100
+        ],
+        "C": [
+          0,
+          0,
+          10,
+          50,
+          150
+        ],
+        "D": [
+          0,
+          0,
+          10,
+          50,
+          150
+        ],
+        "E": [
+          0,
+          0,
+          15,
+          75,
+          200
+        ],
+        "F": [
+          0,
+          0,
+          15,
+          75,
+          200
+        ],
+        "G": [
+          0,
+          0,
+          20,
+          100,
+          400
+        ],
+        "H": [
+          0,
+          0,
+          20,
+          100,
+          400
+        ],
+        "WILD": [
+          0,
+          0,
+          25,
+          125,
+          500
+        ],
+        "SCATTER": [
+          0,
+          0,
+          2,
+          10,
+          50
+        ]
+      },
+      "bonuses": {
+        "free_spins": {
+          "enabled": true,
+          "trigger_symbols": [
+            "SCATTER"
+          ],
+          "trigger_count": 3
+        },
+        "wild": {
+          "enabled": true,
+          "symbol": "WILD"
+        }
+      }
+    },
+    "optimization_params": {
+      "objectives": {
+        "primary": "operator_profit",
+        "secondary": [
+          "player_engagement",
+          "regulatory_compliance"
+        ]
+      },
+      "constraints": {
+        "rtp": {
+          "min": 0.88,
+          "max": 0.96
+        },
+        "volatility": {
+          "min": 5.0,
+          "max": 15.0
+        },
+        "max_win": {
+          "max": 2000
+        },
+        "bonus_frequency": {
+          "min": 0.0025,
+          "max": 0.01
+        }
+      },
+      "optimizable_params": {
+        "symbol_distribution": {
+          "enabled": true,
+          "constraints": {
+            "min_occurrences": {
+              "WILD": 1,
+              "SCATTER": 1
+            },
+            "max_occurrences": {
+              "WILD": 5,
+              "SCATTER": 3
+            }
+          }
+        },
+        "paytable_multipliers": {
+          "enabled": true,
+          "range": [
+            0.8,
+            1.2
+          ]
+        },
+        "bonus_params": {
+          "enabled": true,
+          "free_spins": {
+            "num_spins": {
+              "min": 5,
+              "max": 15,
+              "step": 1
+            },
+            "multiplier": {
+              "min": 1,
+              "max": 3,
+              "step": 1
+            }
+          }
+        }
+      }
+    },
+    "algorithm_params": {
+      "type": "genetic",
+      "population_size": 100,
+      "generations": 50,
+      "mutation_rate": 0.1,
+      "crossover_rate": 0.7,
+      "elite_size": 5,
+      "simulation_runs_per_eval": 10000
+    },
+    "player_model": {
+      "type": "prospect_theory",
+      "risk_aversion": 0.88,
+      "loss_aversion": 2.25,
+      "probability_weighting": 0.65
+    },
+    "output": {
+      "format": "json",
+      "save_interval": 5,
+      "save_population": true,
+      "save_best_config": true,
+      "visualize_progress": true
+    }
+  }
+}

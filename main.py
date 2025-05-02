@@ -102,10 +102,8 @@ def main():
     elif args.command == "optimize":
         # Import and run optimization script 
         try:
-            # This would be implemented when the optimization module is ready
-            print("Optimization module not yet implemented.")
-            # from slot_game_theory.optimization.solver import run_optimization
-            # run_optimization(config_path=args.config, output_dir=args.output)
+            from scripts.run_optimization import run_optimization
+            run_optimization(config_path=args.config, output_dir=args.output)
         except ImportError as e:
             print(f"Error: Could not import optimization module. Make sure the project is set up correctly.")
             print(f"Details: {e}")

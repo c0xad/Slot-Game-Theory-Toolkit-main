@@ -1,0 +1,8 @@
+Optimization Results Summary
+==========================
+
+Status: Failed
+Best objective value: None
+Message: index 1 is out of bounds for axis 0 with size 1
+
+Best parameters:
