@@ -875,9 +875,117 @@ class ReelAnalyzer:
     @staticmethod
     def estimate_volatility(reel_strips: List[ReelStrip], 
                           paylines: Dict[str, Payline],
-                          symbol_payouts: Dict[str, List[float]]) -> float:
+                          symbol_payouts: Dict[str, List[float]],
+                          num_simulations: int = 100000) -> Tuple[float, float, float]:
         """
-        Estimate the volatility (variance) of a slot game configuration.
+        Calculate the volatility of a slot game configuration using Monte Carlo simulation.
+        
+        This method simulates many spins of the slot game and calculates the standard deviation
+        of the payout distribution, which is the proper definition of volatility in slot games.
+        
+        Args:
+            reel_strips: List of ReelStrip objects.
+            paylines: Dictionary of paylines.
+            symbol_payouts: Dictionary mapping symbol names to payouts for different numbers
+                          of matching symbols. For example: {'CHERRY': [0, 0, 5, 10, 50]}
+                          where the index represents the count of symbols (0-indexed).
+            num_simulations: Number of simulations to run (higher is more accurate).
+            
+        Returns:
+            Tuple containing (volatility, hit_frequency, RTP):
+            - volatility: The standard deviation of the payout distribution
+            - hit_frequency: The frequency of winning spins
+            - RTP: The expected Return-To-Player percentage
+        """
+        if not reel_strips or not paylines:
+            return 0.0, 0.0, 0.0
+            
+        # Track payouts across all simulations
+        payouts = []
+        total_win = 0.0
+        winning_spins = 0
+        
+        # Set up default parameters
+        num_reels = len(reel_strips)
+        num_rows = 3  # Use standard 3 visible rows
+        
+        # Run simulations
+        for _ in range(num_simulations):
+            # Generate random stops
+            stops = generate_random_stops(reel_strips)
+            
+            # Get visible window
+            window = get_visible_window(reel_strips, stops, num_rows)
+            
+            # Calculate win for this spin
+            spin_win = 0.0
+            
+            # Check each payline
+            for payline_name, payline in paylines.items():
+                # Extract symbols on this payline
+                payline_symbols = []
+                
+                for reel_idx, row_idx in payline:
+                    if reel_idx < len(window) and row_idx < len(window[reel_idx]):
+                        payline_symbols.append(window[reel_idx][row_idx])
+                    else:
+                        # Skip invalid payline positions
+                        continue
+                
+                # Count consecutive matching symbols from leftmost position
+                if not payline_symbols:
+                    continue
+                    
+                first_symbol = payline_symbols[0]
+                match_count = 1
+                
+                for symbol in payline_symbols[1:]:
+                    if symbol.name == first_symbol.name:
+                        match_count += 1
+                    else:
+                        break
+                
+                # Look up payout for this match
+                if first_symbol.name in symbol_payouts:
+                    payout_table = symbol_payouts[first_symbol.name]
+                    if match_count < len(payout_table):
+                        payout = payout_table[match_count]
+                        spin_win += payout
+            
+            # Record results for this spin
+            payouts.append(spin_win)
+            total_win += spin_win
+            if spin_win > 0:
+                winning_spins += 1
+        
+        # Calculate statistics
+        if num_simulations > 0:
+            # Expected value (RTP)
+            expected_value = total_win / num_simulations
+            
+            # Variance calculation
+            variance = sum((payout - expected_value) ** 2 for payout in payouts) / num_simulations
+            
+            # Standard deviation (volatility)
+            volatility = math.sqrt(variance)
+            
+            # Hit frequency
+            hit_frequency = winning_spins / num_simulations
+            
+            return volatility, hit_frequency, expected_value
+        else:
+            return 0.0, 0.0, 0.0
+            
+    @staticmethod
+    def calculate_detailed_volatility(reel_strips: List[ReelStrip],
+                                    paylines: Dict[str, Payline],
+                                    symbol_payouts: Dict[str, List[float]]) -> Dict[str, Any]:
+        """
+        Calculate detailed volatility metrics using all possible combinations.
+        
+        This method calculates volatility by enumerating all possible outcomes
+        rather than using Monte Carlo simulation. It's more accurate but can be
+        computationally expensive for large reel sets.
         
         Args:
             reel_strips: List of ReelStrip objects.
@@ -885,29 +993,124 @@ class ReelAnalyzer:
             symbol_payouts: Dictionary mapping symbol names to payouts.
             
         Returns:
-            Estimated volatility value.
+            Dictionary containing detailed volatility metrics:
+            - 'volatility': The standard deviation of the payout distribution
+            - 'variance': The variance of the payout distribution
+            - 'rtp': The expected Return-To-Player percentage
+            - 'hit_frequency': The frequency of winning spins
+            - 'max_win': The maximum possible win
+            - 'win_distribution': Distribution of win amounts
         """
-        # Simplified volatility estimation based on payout distribution
-        # A full implementation would run simulations and calculate variance
+        if not reel_strips or not paylines:
+            return {'volatility': 0.0, 'variance': 0.0, 'rtp': 0.0, 
+                    'hit_frequency': 0.0, 'max_win': 0.0}
         
-        # Calculate symbol distribution on first reel as baseline
-        first_reel_dist = {}
-        if reel_strips:
-            first_reel = reel_strips[0]
-            for symbol in first_reel.symbols:
-                first_reel_dist[symbol.name] = first_reel_dist.get(symbol.name, 0) + 1
-            first_reel_dist = {s: count / len(first_reel) for s, count in first_reel_dist.items()}
+        # Calculate total number of possible outcomes
+        total_combinations = 1
+        for strip in reel_strips:
+            total_combinations *= len(strip)
+            
+        # For extremely large state spaces, fall back to Monte Carlo
+        if total_combinations > 10000000:  # 10 million combinations threshold
+            logger.warning(f"Too many combinations ({total_combinations}), using Monte Carlo simulation instead")
+            volatility, hit_freq, rtp = ReelAnalyzer.estimate_volatility(
+                reel_strips, paylines, symbol_payouts)
+            return {
+                'volatility': volatility,
+                'variance': volatility * volatility,
+                'rtp': rtp,
+                'hit_frequency': hit_freq,
+                'max_win': 0.0,  # Not calculated in Monte Carlo
+                'method': 'monte_carlo'
+            }
+            
+        # Number of reels and visible rows
+        num_reels = len(reel_strips)
+        num_rows = 3  # Standard visible window
         
-        # Estimate volatility based on symbol payouts and distribution
-        volatility = 0.0
-        for symbol, payouts in symbol_payouts.items():
-            if symbol in first_reel_dist and len(payouts) > 0:
-                # Use max payout as proxy for volatility contribution
-                max_payout = max(payouts) if payouts else 0
-                symbol_freq = first_reel_dist.get(symbol, 0)
+        # Track all possible payouts and their probabilities
+        payout_distribution = {}
+        total_win = 0.0
+        wins_count = 0
+        max_win = 0.0
+        
+        # Generate all possible stop combinations
+        all_stops = []
+        for reel in reel_strips:
+            all_stops.append(list(range(len(reel))))
+            
+        # Enumerate all possible outcomes using itertools.product
+        import itertools
+        for stops in itertools.product(*all_stops):
+            # Get visible window for these stops
+            window = get_visible_window(reel_strips, stops, num_rows)
+            
+            # Calculate win for this outcome
+            outcome_win = 0.0
+            
+            # Check each payline
+            for payline_name, payline in paylines.items():
+                # Extract symbols on this payline
+                payline_symbols = []
                 
-                # Rare symbols with high payouts contribute more to volatility
-                volatility += max_payout * max_payout * (1 - symbol_freq)
+                for reel_idx, row_idx in payline:
+                    if reel_idx < len(window) and row_idx < len(window[reel_idx]):
+                        payline_symbols.append(window[reel_idx][row_idx])
+                    else:
+                        # Skip invalid payline positions
+                        continue
+                
+                # Count consecutive matching symbols from leftmost position
+                if not payline_symbols:
+                    continue
+                    
+                first_symbol = payline_symbols[0]
+                match_count = 1
+                
+                for symbol in payline_symbols[1:]:
+                    if symbol.name == first_symbol.name:
+                        match_count += 1
+                    else:
+                        break
+                
+                # Look up payout for this match
+                if first_symbol.name in symbol_payouts:
+                    payout_table = symbol_payouts[first_symbol.name]
+                    if match_count < len(payout_table):
+                        payout = payout_table[match_count]
+                        outcome_win += payout
+            
+            # Record this outcome
+            payout_distribution[outcome_win] = payout_distribution.get(outcome_win, 0) + 1
+            total_win += outcome_win
+            if outcome_win > 0:
+                wins_count += 1
+            max_win = max(max_win, outcome_win)
+                
+        # Calculate probability for each payout
+        for payout in payout_distribution:
+            payout_distribution[payout] /= total_combinations
+            
+        # Calculate expected value (RTP)
+        expected_value = total_win / total_combinations
         
-        # Normalize the result
-        return math.sqrt(volatility) / 100.0
+        # Calculate variance
+        variance = sum((payout - expected_value) ** 2 * count 
+                      for payout, count in payout_distribution.items()) / total_combinations
+        
+        # Standard deviation (volatility)
+        volatility = math.sqrt(variance)
+        
+        # Hit frequency
+        hit_frequency = wins_count / total_combinations
+        
+        return {
+            'volatility': volatility,
+            'variance': variance,
+            'rtp': expected_value,
+            'hit_frequency': hit_frequency,
+            'max_win': max_win,
+            'win_distribution': payout_distribution,
+            'method': 'exact_enumeration',
+            'total_combinations': total_combinations
+        }
