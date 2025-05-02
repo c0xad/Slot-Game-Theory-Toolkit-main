@@ -1,0 +1,2 @@
+rtp,variance,hit_frequency,bonus_frequency,expected_payout_per_base_spin,total_base_spins,total_steps,total_payout,total_bet_cost,winning_steps,bonus_entries,duration_sec,gpu_used,variance_reduction,final_balance,batch_number,config_file
+0.0,0.0,0.0,0.055,0.0,1000,1550,0.0,1000.0,0,55,2.2202024459838867,False,,-1000.0,1,sample_slot_game.json

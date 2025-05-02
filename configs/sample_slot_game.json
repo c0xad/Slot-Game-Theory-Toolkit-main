@@ -1,0 +1,46 @@
+{
+    "name": "Sample Slot Game",
+    "default_bet": 1.0,
+    "num_rows": 3,
+    "symbols": {
+        "CHERRY": {"id": 0, "wild": false},
+        "LEMON": {"id": 1, "wild": false},
+        "ORANGE": {"id": 2, "wild": false},
+        "PLUM": {"id": 3, "wild": false},
+        "BELL": {"id": 4, "wild": false},
+        "BAR": {"id": 5, "wild": false},
+        "SEVEN": {"id": 6, "wild": false},
+        "WILD": {"id": 7, "wild": true}
+    },
+    "reel_strips": [
+        ["CHERRY", "LEMON", "ORANGE", "PLUM", "BELL", "BAR", "SEVEN", "WILD"],
+        ["CHERRY", "LEMON", "ORANGE", "PLUM", "BELL", "BAR", "SEVEN", "WILD"],
+        ["CHERRY", "LEMON", "ORANGE", "PLUM", "BELL", "BAR", "SEVEN", "WILD"]
+    ],
+    "paylines": {
+        "center": [[0, 1], [1, 1], [2, 1]],
+        "top": [[0, 0], [1, 0], [2, 0]],
+        "bottom": [[0, 2], [1, 2], [2, 2]],
+        "v": [[0, 2], [1, 1], [2, 2]],
+        "inverted_v": [[0, 0], [1, 1], [2, 0]]
+    },
+    "paytable": {
+        "CHERRY_3_line": 10,
+        "LEMON_3_line": 14,
+        "ORANGE_3_line": 18,
+        "PLUM_3_line": 20,
+        "BELL_3_line": 25,
+        "BAR_3_line": 40,
+        "SEVEN_3_line": 100,
+        "WILD_3_line": 200
+    },
+    "bonus_trigger": {
+        "symbol": "WILD",
+        "count": 3
+    },
+    "bonus_feature": {
+        "type": "FreeSpins",
+        "num_spins": 10,
+        "multiplier": 2.0
+    }
+} 

@@ -1,0 +1,2 @@
+rtp,variance,hit_frequency,bonus_frequency,expected_payout_per_base_spin,total_base_spins,total_steps,total_payout,total_bet_cost,winning_steps,bonus_entries,duration_sec,gpu_used,variance_reduction,final_balance,batch_number,config_file
+0.0,0.0,0.0,0.0,0.0,10000,10000,0.0,10000.0,0,0,0.13995742797851562,False,,-10000.0,1,default_simulation.json

@@ -1,0 +1,71 @@
+{
+    "simulation_name": "default_simulation",
+    "description": "Default simulation configuration for the Slot Game Theory Toolkit",
+    
+    "game_config": {
+        "name": "Basic Slot Game",
+        "type": "standard",
+        "rtp_target": 0.92,
+        "volatility": "medium",
+        
+        "reels": {
+            "num_reels": 5,
+            "num_rows": 3,
+            "paylines": 25,
+            "symbol_distribution": "configs/sample_slot_game.json"
+        },
+        
+        "paytable": {
+            "source": "configs/sample_slot_game.json"
+        },
+        
+        "bonuses": {
+            "free_spins": {
+                "enabled": true,
+                "trigger_symbols": ["SCATTER"],
+                "trigger_count": 3,
+                "num_spins": 10,
+                "multiplier": 1
+            },
+            "wild": {
+                "enabled": true,
+                "symbol": "WILD",
+                "multiplier": 1
+            }
+        }
+    },
+    
+    "simulation_params": {
+        "num_spins": 10000,
+        "bet_size": 1.0,
+        "seed": 42,
+        "collect_metrics": [
+            "rtp", 
+            "hit_frequency", 
+            "volatility",
+            "bonus_frequency",
+            "max_win"
+        ],
+        "track_symbols": true,
+        "track_paylines": true
+    },
+    
+    "player_model": {
+        "type": "prospect_theory",
+        "risk_aversion": 0.88,
+        "loss_aversion": 2.25,
+        "probability_weighting": 0.65,
+        "stopping_criteria": {
+            "type": "bankroll_percentage",
+            "threshold": 0.5
+        }
+    },
+    
+    "output": {
+        "format": "json",
+        "save_interval": 1000,
+        "save_metrics": true,
+        "save_spins": false,
+        "visualize": true
+    }
+} 

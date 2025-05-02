@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slot_game_theory"
+version = "0.0.1"
+authors = [
+  { name="[Your Name or Organization]", email="[your_email@example.com]" },
+]
+description = "A Python toolkit for slot game analysis and design using game theory."
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.8" # Specify your minimum Python version
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Games/Entertainment",
+]
+keywords = ["slot machine", "game theory", "optimization", "simulation", "gambling", "RTP"]
+
+# Add project dependencies here
+# Example: dependencies = ["numpy", "scipy", "pandas"]
+dependencies = [
+    # "numpy",
+    # "scipy",
+    # "pandas",
+    # "matplotlib", # For plotting in notebooks/scripts
+    # "jupyterlab", # For notebooks
+    # "pytest",     # For running tests (often managed separately, see below)
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov", # For coverage reports
+    "mypy",       # Optional static typing checker
+    "ruff",       # Linter/formatter
+    "pre-commit", # For git hooks
+]
+docs = [
+    "sphinx",     # Or "mkdocs"
+    "sphinx-rtd-theme", # Example theme
+]
+
+[project.urls]
+Homepage = "[Your Project URL (e.g., GitHub)]"
+Repository = "[Your Repository URL]"
+# Bug Tracker = "[Your Bug Tracker URL]"
+
+[tool.setuptools.packages.find]
+where = ["src"]  # look for packages in the src directory
+
+# Example configuration for Ruff linter/formatter
+# [tool.ruff]
+# line-length = 88
+# select = ["E", "W", "F", "I", "UP", "PL", "T20"] # Example rule set
+# ignore = []
+
+# Example configuration for pytest
+# [tool.pytest.ini_options]
+# minversion = "7.0"
+# addopts = "-ra -q"
+# testpaths = [
+#     "tests",
+# ]
+
+# Example configuration for coverage
+# [tool.coverage.run]
+# branch = true
+# source = ["src/slot_game_theory"]
+# omit = ["*/__main__.py"]
+
+# [tool.coverage.report]
+# fail_under = 80 # Example minimum coverage percentage
+# show_missing = true
